@@ -70,6 +70,7 @@ function resolveVersion(input) {
       }
     }
   }`);
+        core.debug(`Got releases: ${repository.releases.nodes.map((x) => `${x.tag.name}: ${x.isPrerelease}`)}`);
         const release = repository.releases.nodes.find((x) => !x.isPrerelease);
         if (!release) {
             throw new Error('No latest release found');
@@ -98,9 +99,12 @@ function resolveAsset(version) {
             platform = 'macos';
         }
         const arch = platform === 'macos' ? 'universal' : os_1.default.arch();
+        core.debug(`Looking for version="${version}" platform="${platform}" arch="${arch}"`);
         const asset = repository.release.releaseAssets.nodes.find((x) => {
             const name = x.name.toLowerCase();
-            return name.startsWith(`acorn-${version}-${platform}-${arch}`) && !name.endsWith('.dmg');
+            const ok = name.startsWith(`acorn-${version}-${platform}-${arch}`) && !name.endsWith('.dmg');
+            core.debug(`Testing "${name}": ${ok}`);
+            return ok;
         });
         if (!asset) {
             throw new Error('No release asset found');

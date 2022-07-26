@@ -36,6 +36,8 @@ export async function resolveVersion(input: string): Promise<string> {
     }
   }`)
 
+  core.debug(`Got releases: ${repository.releases.nodes.map((x: any) => `${x.tag.name}: ${x.isPrerelease}`)}`)
+
   const release = repository.releases.nodes.find((x: any) => !x.isPrerelease)
 
   if (!release) {
@@ -70,10 +72,16 @@ export async function resolveAsset(version: string): Promise<Asset> {
 
   const arch = platform === 'macos' ? 'universal' : os.arch()
 
+  core.debug(`Looking for version="${version}" platform="${platform}" arch="${arch}"`)
+
   const asset = repository.release.releaseAssets.nodes.find((x: any) => {
     const name = x.name.toLowerCase()
 
-    return name.startsWith(`acorn-${version}-${platform}-${arch}`) && !name.endsWith('.dmg')
+    const ok = name.startsWith(`acorn-${version}-${platform}-${arch}`) && !name.endsWith('.dmg')
+
+    core.debug(`Testing "${name}": ${ok}`)
+
+    return ok
   })
 
   if (!asset) {
