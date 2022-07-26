@@ -17,7 +17,7 @@ jobs:
         run: |
           npm install && npm run all
 
-      - uses: JasonEtco/build-and-tag-action@v1
+      - uses: JasonEtco/build-and-tag-action@v2
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
