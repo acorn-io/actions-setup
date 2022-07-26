@@ -9,7 +9,7 @@
   dependencies:
     "@actions/http-client" "^2.0.1"
 
-"@actions/exec@^1.0.0":
+"@actions/exec@^1.0.0", "@actions/exec@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@actions/exec/-/exec-1.1.1.tgz#2e43f28c54022537172819a7cf886c844221a611"
   integrity sha512-+sCcHHbVdk93a0XT19ECtO/gIXoxvdsgQLzb2fE2/5sIZmWQuluYyjPQtrtTHdU1YzTZ7bAPN4sITq2xi1679w==
@@ -2840,11 +2840,6 @@ minimist@^1.2.0, minimist@^1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
   integrity sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==
-
-mktemp@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/mktemp/-/mktemp-1.0.0.tgz#b670eff23f52d6529e1dc362cb74ddf85448a9e3"
-  integrity sha512-2duBeS0A75x0M3sCoY0R1TiLsYfIBUtNBNWS++eo+bX/ObVqzblqnEQhlaepoBOLD14wklsV3cYxZ68o5qYO8A==
 
 ms@2.0.0:
   version "2.0.0"

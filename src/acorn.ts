@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import * as exec from '@actions/exec'
 import * as github from '@actions/github'
 import * as tc from '@actions/tool-cache'
 import os from 'os'
@@ -94,4 +95,8 @@ export async function installAsset(asset: Asset): Promise<void> {
   const cachedPath = await tc.cacheDir(dir, 'acorn', asset.version)
   core.addPath(cachedPath)
   core.setOutput('acorn-version', asset.version)
+}
+
+export async function init(): Promise<void> {
+  await exec.getExecOutput('acorn init')
 }

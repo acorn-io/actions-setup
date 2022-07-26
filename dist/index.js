@@ -42,8 +42,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.installAsset = exports.resolveAsset = exports.resolveVersion = void 0;
+exports.init = exports.installAsset = exports.resolveAsset = exports.resolveVersion = void 0;
 const core = __importStar(__nccwpck_require__(2186));
+const exec = __importStar(__nccwpck_require__(1514));
 const github = __importStar(__nccwpck_require__(5438));
 const tc = __importStar(__nccwpck_require__(7784));
 const os_1 = __importDefault(__nccwpck_require__(2037));
@@ -123,6 +124,12 @@ function installAsset(asset) {
     });
 }
 exports.installAsset = installAsset;
+function init() {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec.getExecOutput('acorn init');
+    });
+}
+exports.init = init;
 
 
 /***/ }),
@@ -292,29 +299,27 @@ const acorn = __importStar(__nccwpck_require__(5720));
 const k3s = __importStar(__nccwpck_require__(2002));
 function setup() {
     return __awaiter(this, void 0, void 0, function* () {
-        try {
-            core.saveState('isPost', 'true');
+        if (core.getBooleanInput('k3s-install')) {
             core.info('Installing k3s');
             const containerName = yield k3s.install(core.getInput('k3s-version'));
             core.saveState('containerName', containerName);
-            core.info('Looking up acorn version');
-            const version = yield acorn.resolveVersion(core.getInput('acorn-version'));
-            const asset = yield acorn.resolveAsset(version);
-            core.info('Installing acorn');
-            yield acorn.installAsset(asset);
         }
-        catch (error) {
-            if (error instanceof Error) {
-                core.setFailed(error.message);
-            }
+        core.info('Looking up acorn version');
+        const version = yield acorn.resolveVersion(core.getInput('acorn-version'));
+        const asset = yield acorn.resolveAsset(version);
+        core.info('Installing acorn');
+        yield acorn.installAsset(asset);
+        if (core.getBooleanInput('acorn-init')) {
+            core.info('Initializing acorn on cluster');
+            yield acorn.init();
         }
     });
 }
 function teardown() {
     return __awaiter(this, void 0, void 0, function* () {
         const containerName = core.getState('containerName');
-        const cleanup = core.getState('cleanup');
-        if (cleanup === 'true') {
+        const cleanup = core.getBooleanInput('k3s-cleanup');
+        if (containerName && cleanup) {
             core.info('Cleaning up k3s');
             yield k3s.remove(containerName);
         }
@@ -322,11 +327,19 @@ function teardown() {
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        if (core.getState('isPost')) {
-            return teardown();
+        try {
+            if (core.getState('isPost')) {
+                yield teardown();
+            }
+            else {
+                core.saveState('isPost', 'true');
+                yield setup();
+            }
         }
-        else {
-            return setup();
+        catch (error) {
+            if (error instanceof Error) {
+                core.setFailed(error.message);
+            }
         }
     });
 }

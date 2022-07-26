@@ -6,14 +6,24 @@ inputs:
     description: 'Version of acorn to install'
     default: latest
     required: false
+  acorn-init:
+    description: Whether to initialize acorn in the cluster
+    required: false
+    default: 'true'
+
+  k3s-install:
+    description: Whether to install k3s or not
+    required: false
+    default: 'true'
   k3s-version:
     description: 'Version of k3s to install'
     default: latest
     required: false
-  cleanup:
+  k3s-cleanup:
     description: Cleanup k3s container after running'
     required: false
     default: 'true'
+
   token:
     description: 'Github token to make API calls with'
     required: false
