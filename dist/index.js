@@ -98,7 +98,13 @@ function resolveAsset(version) {
         if (platform === 'darwin') {
             platform = 'macos';
         }
-        const arch = platform === 'macos' ? 'universal' : os_1.default.arch();
+        let arch = os_1.default.arch();
+        if (platform === 'macos') {
+            arch = 'universal';
+        }
+        else if (arch === 'x64') {
+            arch = 'amd64';
+        }
         core.debug(`Looking for version="${version}" platform="${platform}" arch="${arch}"`);
         const asset = repository.release.releaseAssets.nodes.find((x) => {
             const name = x.name.toLowerCase();

@@ -70,7 +70,12 @@ export async function resolveAsset(version: string): Promise<Asset> {
     platform = 'macos'
   }
 
-  const arch = platform === 'macos' ? 'universal' : os.arch()
+  let arch = os.arch()
+  if (platform === 'macos') {
+    arch = 'universal'
+  } else if (arch === 'x64') {
+    arch = 'amd64'
+  }
 
   core.debug(`Looking for version="${version}" platform="${platform}" arch="${arch}"`)
 
