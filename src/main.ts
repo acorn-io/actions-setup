@@ -10,6 +10,7 @@ async function setup(): Promise<void> {
     const containerName = await k3s.install(core.getInput('k3s-version'))
     core.saveState('containerName', containerName)
 
+    core.info('Looking up acorn version')
     const version = await acorn.resolveVersion(core.getInput('acorn-version'))
     const asset = await acorn.resolveAsset(version)
 

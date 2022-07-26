@@ -1,7 +1,7 @@
 import wait from './wait'
 import * as core from '@actions/core'
 
-export default async function retry<T>(fn: () => Promise<T>, msg = 'Retrying', tries = 10, delay = 2): Promise<T | undefined> {
+export default async function retry<T>(fn: () => Promise<T>, msg = 'Retrying', tries = 30, delay = 1): Promise<T | undefined> {
   let count = 1
   while (count <= tries) {
     try {

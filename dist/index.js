@@ -209,7 +209,7 @@ function install(version) {
         core.info(`Running in container: ${containerName}`);
         core.exportVariable('KUBECONFIG', kubeconfig);
         core.setOutput('kubeconfig', kubeconfig);
-        yield (0, retry_1.default)(() => __awaiter(this, void 0, void 0, function* () {
+        const ok = yield (0, retry_1.default)(() => __awaiter(this, void 0, void 0, function* () {
             try {
                 yield (0, promises_1.access)(kubeconfig);
                 return true;
@@ -218,6 +218,9 @@ function install(version) {
                 return false;
             }
         }), 'Waiting for kubeconfig');
+        if (ok !== true) {
+            throw new Error('Gave up waiting for kubeconfig');
+        }
         const nodeName = yield (0, retry_1.default)(() => __awaiter(this, void 0, void 0, function* () {
             res = yield exec.getExecOutput('kubectl get nodes --no-headers -oname');
             if (res.stdout) {
@@ -230,7 +233,7 @@ function install(version) {
             yield exec.exec(command);
         }
         else {
-            core.setFailed('Failed to resolve node name.');
+            throw new Error('Failed to resolve node name.');
         }
         return containerName;
     });
@@ -294,6 +297,7 @@ function setup() {
             core.info('Installing k3s');
             const containerName = yield k3s.install(core.getInput('k3s-version'));
             core.saveState('containerName', containerName);
+            core.info('Looking up acorn version');
             const version = yield acorn.resolveVersion(core.getInput('acorn-version'));
             const asset = yield acorn.resolveAsset(version);
             core.info('Installing acorn');
@@ -374,7 +378,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const wait_1 = __importDefault(__nccwpck_require__(5817));
 const core = __importStar(__nccwpck_require__(2186));
-function retry(fn, msg = 'Retrying', tries = 10, delay = 2) {
+function retry(fn, msg = 'Retrying', tries = 30, delay = 1) {
     return __awaiter(this, void 0, void 0, function* () {
         let count = 1;
         while (count <= tries) {

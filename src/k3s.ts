@@ -45,7 +45,7 @@ export async function install(version: string): Promise<string> {
   core.exportVariable('KUBECONFIG', kubeconfig)
   core.setOutput('kubeconfig', kubeconfig)
 
-  await retry<boolean>(async () => {
+  const ok = await retry<boolean>(async () => {
     try {
       await access(kubeconfig)
       return true
@@ -53,6 +53,10 @@ export async function install(version: string): Promise<string> {
       return false
     }
   }, 'Waiting for kubeconfig')
+
+  if (ok !== true) {
+    throw new Error('Gave up waiting for kubeconfig')
+  }
 
   const nodeName = await retry<string>(async () => {
     res = await exec.getExecOutput('kubectl get nodes --no-headers -oname')
@@ -68,7 +72,7 @@ export async function install(version: string): Promise<string> {
     const command = `kubectl wait --for=condition=Ready ${nodeName}`
     await exec.exec(command)
   } else {
-    core.setFailed('Failed to resolve node name.')
+    throw new Error('Failed to resolve node name.')
   }
 
   return containerName
