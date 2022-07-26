@@ -1,6 +1,9 @@
 name: Acorn Setup
 description: 'Installs Acorn'
 author: 'Acorn Labs, Inc.'
+branding:
+  icon: terminal
+  color: purple
 inputs:
   acorn-version:
     description: 'Version of acorn to install'
