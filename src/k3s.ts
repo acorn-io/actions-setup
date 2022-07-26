@@ -26,7 +26,7 @@ export async function install(version: string): Promise<string> {
     '-e',
     'K3S_KUBECONFIG_MODE=666',
     '-v',
-    `/tmp/output:${dir}`,
+    `${dir}:${dir}`,
     '-p',
     '6443:6443',
     '-p',

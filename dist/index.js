@@ -193,7 +193,7 @@ function install(version) {
             '-e',
             'K3S_KUBECONFIG_MODE=666',
             '-v',
-            `/tmp/output:${dir}`,
+            `${dir}:${dir}`,
             '-p',
             '6443:6443',
             '-p',
