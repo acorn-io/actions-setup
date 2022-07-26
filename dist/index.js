@@ -172,7 +172,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.remove = exports.install = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
-const wait_1 = __importDefault(__nccwpck_require__(5817));
+const retry_1 = __importDefault(__nccwpck_require__(4137));
 const promises_1 = __nccwpck_require__(3977);
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const os_1 = __importDefault(__nccwpck_require__(2037));
@@ -209,21 +209,22 @@ function install(version) {
         core.info(`Running in container: ${containerName}`);
         core.exportVariable('KUBECONFIG', kubeconfig);
         core.setOutput('kubeconfig', kubeconfig);
-        let nodeName;
-        const count = 1;
-        const delay = 2;
-        const tries = 20;
-        while (!nodeName && count <= tries) {
+        yield (0, retry_1.default)(() => __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield (0, promises_1.access)(kubeconfig);
+                return true;
+            }
+            catch (e) {
+                return false;
+            }
+        }), 'Waiting for kubeconfig');
+        const nodeName = yield (0, retry_1.default)(() => __awaiter(this, void 0, void 0, function* () {
             res = yield exec.getExecOutput('kubectl get nodes --no-headers -oname');
             if (res.stdout) {
-                nodeName = res.stdout;
-                break;
+                return res.stdout;
             }
-            else {
-                core.info(`Unable to resolve node name, waiting ${delay} seconds and trying again. Attempt ${count} of ${tries}.`);
-                yield (0, wait_1.default)(delay * 1000);
-            }
-        }
+            return '';
+        }));
         if (nodeName) {
             const command = `kubectl wait --for=condition=Ready ${nodeName}`;
             yield exec.exec(command);
@@ -326,6 +327,74 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 4137:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const wait_1 = __importDefault(__nccwpck_require__(5817));
+const core = __importStar(__nccwpck_require__(2186));
+function retry(fn, msg = 'Retrying', tries = 10, delay = 2) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let count = 1;
+        while (count <= tries) {
+            try {
+                const res = yield fn();
+                if (res) {
+                    return res;
+                }
+            }
+            catch (e) {
+                // Nothing
+            }
+            count++;
+            core.info(`${msg} ${count}/${tries}`);
+            yield (0, wait_1.default)(delay * 1000);
+        }
+        return undefined;
+    });
+}
+exports["default"] = retry;
 
 
 /***/ }),

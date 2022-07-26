@@ -2,8 +2,8 @@
 
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import wait from './wait'
-import {mkdtemp} from 'node:fs/promises'
+import retry from './retry'
+import {mkdtemp, access} from 'node:fs/promises'
 import path from 'path'
 import os from 'os'
 
@@ -45,21 +45,24 @@ export async function install(version: string): Promise<string> {
   core.exportVariable('KUBECONFIG', kubeconfig)
   core.setOutput('kubeconfig', kubeconfig)
 
-  let nodeName
-  const count = 1
-  const delay = 2
-  const tries = 20
-  while (!nodeName && count <= tries) {
+  await retry<boolean>(async () => {
+    try {
+      await access(kubeconfig)
+      return true
+    } catch (e) {
+      return false
+    }
+  }, 'Waiting for kubeconfig')
+
+  const nodeName = await retry<string>(async () => {
     res = await exec.getExecOutput('kubectl get nodes --no-headers -oname')
 
     if (res.stdout) {
-      nodeName = res.stdout
-      break
-    } else {
-      core.info(`Unable to resolve node name, waiting ${delay} seconds and trying again. Attempt ${count} of ${tries}.`)
-      await wait(delay * 1000)
+      return res.stdout
     }
-  }
+
+    return ''
+  })
 
   if (nodeName) {
     const command = `kubectl wait --for=condition=Ready ${nodeName}`
