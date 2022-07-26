@@ -4,7 +4,7 @@
   <a href="https://github.com/acorn-io/actions-setup"><img alt="GitHub Actions status" src="https://github.com/acorn-io/actions-setup/workflows/Main%20workflow/badge.svg"></a>
 </p>
 
-GitHub action to install Acorn CLI
+GitHub action to install Acorn CLI and spin up a k3s cluster
 
 # Usage
 
@@ -12,9 +12,19 @@ GitHub action to install Acorn CLI
 steps:
 - uses: actions/checkout@master
 - uses: acorn-io/actions-setup@v1
-- run:  ...your workflow...
+- run: |
+  acorn version # acorn build, acorn run, etc
 ```
 
+# Options
+
+| Key             | Default  | Description |
+| --------------- | ---------| ----------- |
+| `acorn-version` | `latest` | Version of Acorn to install
+| `acorn-init`    | `true`   | Should the acorn runtime beinstalled into the cluster
+| `k3s-install`   | `true`   | Whether to spin up a container running k3s for acorn to run in
+| `k3s-version`   | `latest` | Version of K3s to install
+| `k3s-cleanup`   | `true`   | Whether to cleanup the k3s container after job completion
 
 # License
 
