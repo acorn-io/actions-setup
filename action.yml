@@ -1,11 +1,23 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: Acorn Setup
+description: 'Installs Acorn'
+author: 'Acorn Labs, Inc.'
 inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  acorn-version:
+    description: 'Version of acorn to install'
+    default: latest
+    required: false
+  k3s-version:
+    description: 'Version of k3s to install'
+    default: latest
+    required: false
+  cleanup:
+    description: Cleanup k3s container after running'
+    required: false
+    default: 'true'
+  token:
+    description: 'Github token to make API calls with'
+    required: false
 runs:
   using: 'node16'
   main: 'dist/index.js'
+  post: 'dist/index.js'
