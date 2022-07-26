@@ -9,8 +9,10 @@ async function setup(): Promise<void> {
     core.saveState('containerName', containerName)
   }
 
-  core.info('Looking up acorn version')
+  core.info(`Selecting acorn version from: ${core.getInput('acorn-version')}`)
   const version = await acorn.resolveVersion(core.getInput('acorn-version'))
+
+  core.info(`Looking up acorn version: ${version}`)
   const asset = await acorn.resolveAsset(version)
 
   core.info('Installing acorn')

@@ -304,8 +304,9 @@ function setup() {
             const containerName = yield k3s.install(core.getInput('k3s-version'));
             core.saveState('containerName', containerName);
         }
-        core.info('Looking up acorn version');
+        core.info(`Selecting acorn version from: ${core.getInput('acorn-version')}`);
         const version = yield acorn.resolveVersion(core.getInput('acorn-version'));
+        core.info(`Looking up acorn version: ${version}`);
         const asset = yield acorn.resolveAsset(version);
         core.info('Installing acorn');
         yield acorn.installAsset(asset);
