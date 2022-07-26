@@ -13,7 +13,7 @@ interface Asset {
   url: string
 }
 
-export async function resolveVersion(input: string): Promise<string> {
+export async function resolveVersion(input: string, ignore?: string): Promise<string> {
   if (input && input !== 'latest') {
     if (input.startsWith('v')) {
       return input
@@ -38,7 +38,7 @@ export async function resolveVersion(input: string): Promise<string> {
 
   core.debug(`Got releases: ${repository.releases.nodes.map((x: any) => `${x.tag.name}: ${x.isPrerelease}`)}`)
 
-  const release = repository.releases.nodes.find((x: any) => !x.isPrerelease)
+  const release = repository.releases.nodes.find((x: any) => !x.isPrerelease && x.tag.name !== ignore)
 
   if (!release) {
     throw new Error('No latest release found')

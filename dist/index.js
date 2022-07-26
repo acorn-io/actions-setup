@@ -49,7 +49,7 @@ const github = __importStar(__nccwpck_require__(5438));
 const tc = __importStar(__nccwpck_require__(7784));
 const os_1 = __importDefault(__nccwpck_require__(2037));
 const octokit = github.getOctokit(core.getInput('token'));
-function resolveVersion(input) {
+function resolveVersion(input, ignore) {
     return __awaiter(this, void 0, void 0, function* () {
         if (input && input !== 'latest') {
             if (input.startsWith('v')) {
@@ -71,7 +71,7 @@ function resolveVersion(input) {
     }
   }`);
         core.debug(`Got releases: ${repository.releases.nodes.map((x) => `${x.tag.name}: ${x.isPrerelease}`)}`);
-        const release = repository.releases.nodes.find((x) => !x.isPrerelease);
+        const release = repository.releases.nodes.find((x) => !x.isPrerelease && x.tag.name !== ignore);
         if (!release) {
             throw new Error('No latest release found');
         }
@@ -315,9 +315,17 @@ function setup() {
             core.saveState('containerName', containerName);
         }
         core.info(`Selecting acorn version from: ${core.getInput('acorn-version')}`);
-        const version = yield acorn.resolveVersion(core.getInput('acorn-version'));
+        let version = yield acorn.resolveVersion(core.getInput('acorn-version'));
         core.info(`Looking up acorn version: ${version}`);
-        const asset = yield acorn.resolveAsset(version);
+        let asset;
+        try {
+            asset = yield acorn.resolveAsset(version);
+        }
+        catch (e) {
+            // If it fails, try the next older version
+            version = yield acorn.resolveVersion(core.getInput('acorn-version'), version);
+            asset = yield acorn.resolveAsset(version);
+        }
         core.info('Installing acorn');
         yield acorn.installAsset(asset);
         if (core.getBooleanInput('acorn-init')) {
