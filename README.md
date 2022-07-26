@@ -1,8 +1,6 @@
 # actions-setup
 
-<p align="left">
-  <a href="https://github.com/acorn-io/actions-setup"><img alt="GitHub Actions status" src="https://github.com/acorn-io/actions-setup/workflows/Main%20workflow/badge.svg"></a>
-</p>
+[![build-test](https://github.com/acorn-io/actions-setup/actions/workflows/test.yml/badge.svg)](https://github.com/acorn-io/actions-setup/actions/workflows/test.yml)
 
 GitHub action to install Acorn CLI and spin up a k3s cluster
 
