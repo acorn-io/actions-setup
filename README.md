@@ -21,13 +21,13 @@ jobs:
 
 # Options
 
-| Key             | Default  | Description |
-| --------------- | ---------| ----------- |
-| `acorn-version` | `latest` | Version of Acorn to install
-| `acorn-init`    | `true`   | Should the acorn runtime beinstalled into the cluster
-| `k3s-install`   | `true`   | Whether to spin up a container running k3s for acorn to run in
-| `k3s-version`   | `latest` | Version of K3s to install
-| `k3s-cleanup`   | `true`   | Whether to cleanup the k3s container after job completion
+| Key             | Default    | Description |
+| --------------- | -----------| ----------- |
+| `acorn-init`    | `true`     | Run `acorn init` to install the runtime into the cluster
+| `acorn-version` | `"latest"` | Version of Acorn to install
+| `k3s-cleanup`   | `true`     | Cleanup the k3s container after job completion
+| `k3s-install`   | `true`     | Spin up a container running k3s for acorn to run in
+| `k3s-version`   | `"latest"` | Version of K3s to install
 
 # Bring-your-own-Cluster
 
