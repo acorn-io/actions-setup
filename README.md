@@ -4,14 +4,19 @@
 
 GitHub action to install Acorn CLI and spin up a k3s cluster
 
-# Usage
+# Quick Start
 
 ```yaml
-steps:
-- uses: actions/checkout@master
-- uses: acorn-io/actions-setup@v1
-- run: |
-  acorn version # acorn build, acorn run, etc
+name: My Workflow
+on:
+  push: {}
+jobs:
+  publish:
+    steps:
+    - uses: actions/checkout@master
+    - uses: acorn-io/actions-setup@v1
+    - run: |
+      acorn --version # acorn build, acorn run, etc
 ```
 
 # Options
@@ -23,6 +28,28 @@ steps:
 | `k3s-install`   | `true`   | Whether to spin up a container running k3s for acorn to run in
 | `k3s-version`   | `latest` | Version of K3s to install
 | `k3s-cleanup`   | `true`   | Whether to cleanup the k3s container after job completion
+
+# Bring-your-own-Cluster
+
+If you already have a cluster to run Acorn against, you can point to it instead of spinning up k3s:
+
+```yaml
+name: My Workflow
+on:
+  push: {}
+jobs:
+  publish:
+    steps:
+    - uses: actions/checkout@master
+    - uses: acorn-io/actions-setup@v1
+      with:
+        k3s-install: false
+        acorn-init: false
+    - env:
+        KUBECONFIG: '/path/to/your/kubeconfig.yaml'
+      run: |
+        acorn --version # acorn build, acorn run, etc
+```
 
 # License
 
