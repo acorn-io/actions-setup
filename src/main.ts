@@ -10,17 +10,10 @@ async function setup(): Promise<void> {
   }
 
   core.info(`Selecting acorn version from: ${core.getInput('acorn-version')}`)
-  let version = await acorn.resolveVersion(core.getInput('acorn-version'))
+  const version = await acorn.resolveVersion(core.getInput('acorn-version'))
 
   core.info(`Looking up acorn version: ${version}`)
-  let asset
-  try {
-    asset = await acorn.resolveAsset(version)
-  } catch (e) {
-    // If it fails, try the next older version
-    version = await acorn.resolveVersion(core.getInput('acorn-version'), version)
-    asset = await acorn.resolveAsset(version)
-  }
+  const asset = await acorn.resolveAsset(version)
 
   core.info('Installing acorn')
   await acorn.installAsset(asset)

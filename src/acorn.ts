@@ -1,10 +1,8 @@
 import * as core from '@actions/core'
 import * as exec from '@actions/exec'
-import * as github from '@actions/github'
 import * as tc from '@actions/tool-cache'
+import fetch from 'node-fetch'
 import os from 'os'
-
-const octokit = github.getOctokit(core.getInput('token'))
 
 interface Asset {
   version: string
@@ -13,91 +11,65 @@ interface Asset {
   url: string
 }
 
-export async function resolveVersion(input: string, ignore?: string): Promise<string> {
-  if (input && input !== 'latest') {
-    if (input.startsWith('v')) {
-      return input
-    }
+export async function getChannels(): Promise<Record<string, string>> {
+  const res = await fetch('https://update.acrn.io/v1-release/channels', {headers: {accept: 'application/json'}})
+  const body = (await res.json()) as any
 
+  const out: Record<string, string> = {}
+
+  for (const entry of body.data) {
+    out[entry.id as string] = entry.latest
+  }
+
+  console.info('Channels: ', out)
+
+  return out
+}
+
+export async function resolveVersion(input: string): Promise<string> {
+  if (input.match(/^\d+/)) {
     return `v${input}`
+  } else if (input.match(/^v\d+/)) {
+    return input
   }
 
-  const {repository} = await octokit.graphql(`{
-    repository(owner: "acorn-io", name: "acorn") {
-      releases(first:100, orderBy: {field: CREATED_AT, direction: DESC}) {
-        nodes {
-          id
-          tag {
-            name
-          }
-          isPrerelease
-        }
-      }
-    }
-  }`)
+  const channels = await getChannels()
 
-  core.debug(`Got releases: ${repository.releases.nodes.map((x: any) => `${x.tag.name}: ${x.isPrerelease}`)}`)
-
-  const release = repository.releases.nodes.find((x: any) => !x.isPrerelease && x.tag.name !== ignore)
-
-  if (!release) {
-    throw new Error('No latest release found')
+  if (channels[input]) {
+    return channels[input]
   }
 
-  return release.tag.name
+  // There is no latest yet...
+  if (input === 'latest' && channels['testing']) {
+    return channels['testing']
+  }
+
+  throw new Error(`No release found for ${input}`)
 }
 
 export async function resolveAsset(version: string): Promise<Asset> {
-  const {repository} = await octokit.graphql(
-    `
-  query($tag: String!) {
-    repository(owner:"acorn-io",name:"acorn") {
-      release(tagName: $tag) {
-        releaseAssets(first: 100) {
-          nodes {
-            name
-            url
-          }
-        }
-      }
-    }
-  }`,
-    {tag: version}
-  )
-
   let platform = `${os.platform()}`
+  let extension = 'tar.gz'
+  let arch = os.arch()
+
   if (platform === 'darwin') {
     platform = 'macos'
+    arch = 'universal'
+  } else if (platform === 'windows') {
+    extension = 'zip'
   }
 
-  let arch = os.arch()
-  if (platform === 'macos') {
-    arch = 'universal'
-  } else if (arch === 'x64') {
+  if (arch === 'x64') {
     arch = 'amd64'
   }
 
-  core.debug(`Looking for version="${version}" platform="${platform}" arch="${arch}"`)
-
-  const asset = repository.release.releaseAssets.nodes.find((x: any) => {
-    const name = x.name.toLowerCase()
-
-    const ok = name.startsWith(`acorn-${version}-${platform}-${arch}`) && !name.endsWith('.dmg')
-
-    core.debug(`Testing "${name}": ${ok}`)
-
-    return ok
-  })
-
-  if (!asset) {
-    throw new Error('No release asset found')
-  }
+  const url = `https://github.com/acorn-io/acorn/releases/download/${version}/acorn-${version}-${platform}-${arch}.${extension}`
 
   return Promise.resolve({
     version,
     platform,
     arch,
-    url: asset.url
+    url
   } as Asset)
 }
 

@@ -27,9 +27,6 @@ inputs:
     required: false
     default: 'true'
 
-  token:
-    description: 'Github token to make API calls with'
-    required: false
 runs:
   using: 'node16'
   main: 'dist/index.js'
