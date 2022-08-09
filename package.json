@@ -27,7 +27,7 @@
     "yarn": "^1.22.19"
   },
   "devDependencies": {
-    "@actions/core": "^1.6.0",
+    "@actions/core": "^1.9.1",
     "@actions/exec": "^1.1.1",
     "@actions/tool-cache": "^2.0.1",
     "@types/node": "^18.6.1",
