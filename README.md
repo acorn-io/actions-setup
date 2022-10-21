@@ -14,7 +14,7 @@ jobs:
   publish:
     steps:
     - uses: actions/checkout@master
-    - uses: acorn-io/actions-setup@v1
+    - uses: acorn-io/actions-setup@v2
     - run: |
       acorn --version # acorn build, acorn run, etc
 ```
@@ -25,6 +25,7 @@ jobs:
 | --------------- | -----------| ----------- |
 | `acorn-init`    | `true`     | Run `acorn init` to install the runtime into the cluster
 | `acorn-version` | `"latest"` | Version of Acorn to install
+| `kubeconfig`    | (none)     | Contents of a kubeconfig to use instead of spinning up k3s
 | `k3s-cleanup`   | `true`     | Cleanup the k3s container after job completion
 | `k3s-install`   | `true`     | Spin up a container running k3s for acorn to run in
 | `k3s-version`   | `"latest"` | Version of K3s to install
@@ -41,12 +42,10 @@ jobs:
   publish:
     steps:
     - uses: actions/checkout@master
-    - uses: acorn-io/actions-setup@v1
+    - uses: acorn-io/actions-setup@v2
       with:
-        k3s-install: false
-        acorn-init: false
-    - env:
-        KUBECONFIG: '/path/to/your/kubeconfig.yaml'
+        kubeconfig:  ${{secrets.YOUR_KUBECONFIG}}
+        acorn-init: true # If acorn is already installed, set this to false
       run: |
         acorn --version # acorn build, acorn run, etc
 ```
