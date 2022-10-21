@@ -14,6 +14,10 @@ inputs:
     required: false
     default: 'true'
 
+  kubeconfig:
+    description: Provide a kubeconfig to use instead of installing k3s
+    required: false
+    default: ''
   k3s-install:
     description: Whether to install k3s or not
     required: false

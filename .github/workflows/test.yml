@@ -20,8 +20,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./
-        with:
-          token: ${{secrets.ACORN_TOKEN}}
       - run: acorn
         shell: bash
-
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./
+        with:
+          k3s-install: false
+          kubeconfig: 'hello kube'
+          acorn-version: main
+          acorn-init: false
+      - run: |
+          env
+          acorn
