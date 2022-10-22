@@ -12,7 +12,7 @@ inputs:
   acorn-init:
     description: Whether to initialize acorn in the cluster
     required: false
-    default: 'true'
+    default: 'auto'
 
   kubeconfig:
     description: Provide a kubeconfig to use instead of installing k3s

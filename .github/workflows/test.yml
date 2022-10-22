@@ -15,23 +15,21 @@ jobs:
           npm install
       - run: |
           npm run all
-  test: # make sure the action works on a clean machine without building
+  k3s: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ./
       - run: acorn
         shell: bash
-  main:
+  kubeconfig:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ./
         with:
-          k3s-install: false
           kubeconfig: 'hello kube'
           acorn-version: main
-          acorn-init: false
       - run: |
           env
           acorn

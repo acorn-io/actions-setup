@@ -7,6 +7,15 @@ import {resolve} from 'path'
 async function setup(): Promise<void> {
   const kubeconfig = core.getInput('kubeconfig')
 
+  const initStr = core.getInput('acorn-init')
+  let init = false
+
+  if (initStr === 'auto') {
+    init = !kubeconfig
+  } else {
+    init = core.getBooleanInput('acorn-init')
+  }
+
   if (kubeconfig) {
     core.info(`Applying kubeconfig`)
 
@@ -35,9 +44,11 @@ async function setup(): Promise<void> {
   core.info('Installing acorn')
   await acorn.installAsset(asset)
 
-  if (core.getBooleanInput('acorn-init')) {
+  if (init) {
     core.info('Initializing acorn on cluster')
     await acorn.init()
+  } else {
+    core.info('Skipping acorn init')
   }
 }
 

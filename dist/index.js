@@ -325,6 +325,14 @@ const path_1 = __nccwpck_require__(1017);
 function setup() {
     return __awaiter(this, void 0, void 0, function* () {
         const kubeconfig = core.getInput('kubeconfig');
+        const initStr = core.getInput('acorn-init');
+        let init = false;
+        if (initStr === 'auto') {
+            init = !kubeconfig;
+        }
+        else {
+            init = core.getBooleanInput('acorn-init');
+        }
         if (kubeconfig) {
             core.info(`Applying kubeconfig`);
             if (!(0, fs_1.existsSync)('.kube')) {
@@ -347,9 +355,12 @@ function setup() {
         const asset = yield acorn.resolveAsset(version);
         core.info('Installing acorn');
         yield acorn.installAsset(asset);
-        if (core.getBooleanInput('acorn-init')) {
+        if (init) {
             core.info('Initializing acorn on cluster');
             yield acorn.init();
+        }
+        else {
+            core.info('Skipping acorn init');
         }
     });
 }
