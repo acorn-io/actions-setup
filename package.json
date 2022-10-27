@@ -31,7 +31,7 @@
     "@actions/exec": "^1.1.1",
     "@actions/tool-cache": "^2.0.1",
     "@types/node": "^18.11.3",
-    "@types/semver": "^7.3.12",
+    "@types/semver": "^7.3.13",
     "@typescript-eslint/parser": "^5.40.1",
     "@vercel/ncc": "^0.34.0",
     "eslint": "^8.25.0",
